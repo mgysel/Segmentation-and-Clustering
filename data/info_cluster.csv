@@ -1,0 +1,96 @@
+"","Store","Address","City","State","Zip","Type","cluster"
+"1","S0001","1000 W El Norte Pkwy","Escondido","CA",92027,"Existing",2
+"2","S0002","12419 Woodside Ave","Lakeside","CA",92040,"Existing",2
+"3","S0003","1342 N Alvarado St","Los Angeles","CA",90026,"Existing",3
+"4","S0004","671 S Rancho Santa Fe Rd","San Marcos","CA",92078,"Existing",2
+"5","S0005","1430 S Fairfax Ave","Los Angeles","CA",90019,"Existing",3
+"6","S0006","9643 Mission Gorge Rd","Santee","CA",92071,"Existing",2
+"7","S0007","820 Arneill Rd","Camarillo","CA",93010,"Existing",2
+"8","S0008","3461 W 3rd St","Los Angeles","CA",90020,"Existing",3
+"9","S0009","4033 W Avenue L","Lancaster","CA",93536,"Existing",2
+"10","S0010","1040 Coast Village Rd","Montecito","CA",93108,"Existing",3
+"11","S0011","3251 De Forest Cir Ste A","Mira Loma","CA",91752,"Existing",2
+"12","S0012","1124 W Ocean Ave","Lompoc","CA",93436,"Existing",2
+"13","S0013","3520 Riverside Plaza Dr","Riverside","CA",92506,"Existing",2
+"14","S0014","3901 Portola Pkwy","Irvine","CA",92620,"Existing",1
+"15","S0015","10675 Scripps Poway Pkwy","San Diego","CA",92131,"Existing",1
+"16","S0016","1201 Avocado Ave","El Cajon","CA",92020,"Existing",2
+"17","S0017","30252 Crown Valley Pkwy","Laguna Niguel","CA",92677,"Existing",3
+"18","S0018","10001 Paramount Blvd","Downey","CA",90240,"Existing",2
+"19","S0019","17390 Main St","Hesperia","CA",92345,"Existing",1
+"20","S0020","850 Linden Ave","Carpinteria","CA",93013,"Existing",3
+"21","S0021","1311 Wilshire Blvd","Santa Monica","CA",90403,"Existing",3
+"22","S0022","13438 Poway Rd","Poway","CA",92064,"Existing",2
+"23","S0023","5922 Edinger Ave","Huntington Beach","CA",92649,"Existing",3
+"24","S0024","15740 La Forge St","Whittier","CA",90603,"Existing",1
+"25","S0025","2684 N Tustin St","Orange","CA",92865,"Existing",2
+"26","S0026","2039 Verdugo Blvd","Montrose","CA",91020,"Existing",3
+"27","S0027","29211 Heathercliff Rd","Malibu","CA",90265,"Existing",3
+"28","S0028","24160 Lyons Ave","Newhall","CA",91321,"Existing",2
+"29","S0029","2058 W Avenue J","Lancaster","CA",93534,"Existing",2
+"30","S0030","3125 W Florida Ave","Hemet","CA",92545,"Existing",2
+"31","S0031","31564 Grape St","Lake Elsinore","CA",92532,"Existing",1
+"32","S0032","16550 Soledad Canyon Rd","Santa Clarita","CA",91351,"Existing",1
+"33","S0033","11322 Los Alamitos Blvd","Los Alamitos","CA",90720,"Existing",3
+"34","S0034","1125 Maricopa Hwy","Ojai","CA",93023,"Existing",3
+"35","S0035","81 W Foothill Blvd","Upland","CA",91786,"Existing",2
+"36","S0036","33644 Yucaipa Blvd","Yucaipa","CA",92399,"Existing",1
+"37","S0037","4627 Carmel Mountain Rd","San Diego","CA",92130,"Existing",1
+"38","S0038","5805 E Los Angeles Ave","Simi Valley","CA",93063,"Existing",3
+"39","S0039","1221 S Gaffey St","San Pedro","CA",90731,"Existing",2
+"40","S0040","4550 Atlantic Ave","Long Beach","CA",90807,"Existing",2
+"41","S0041","12801 Excelsior Dr","Santa Fe Springs","CA",90670,"Existing",2
+"42","S0042","13439 Camino Canada","El Cajon","CA",92021,"Existing",2
+"43","S0043","2048 E Avenida De Los Arboles","Thousand Oaks","CA",91360,"Existing",3
+"44","S0044","7789 Foothill Blvd","Tujunga","CA",91042,"Existing",2
+"45","S0045","6351 Haven Ave","Rancho Cucamonga","CA",91737,"Existing",1
+"46","S0046","1820 Ximeno Ave","Long Beach","CA",90815,"Existing",3
+"47","S0047","4200 Chino Hills Pkwy Ste 400","Chino Hills","CA",91709,"Existing",1
+"48","S0048","845 College Blvd","Oceanside","CA",92057,"Existing",1
+"49","S0049","550 E 1st St","Tustin","CA",92780,"Existing",3
+"50","S0050","7 Peninsula Ctr","Rolling Hills Estates","CA",90274,"Existing",3
+"51","S0051","26022 Marguerite Pkwy","Mission Viejo","CA",92692,"Existing",3
+"52","S0052","635 Foothill Blvd","La Canada","CA",91011,"Existing",3
+"53","S0053","750 N Imperial Ave","El Centro","CA",92243,"Existing",2
+"54","S0054","2938 Tapo Canyon Rd","Simi Valley","CA",93063,"Existing",3
+"55","S0055","330 W El Norte Pkwy","Escondido","CA",92026,"Existing",1
+"56","S0056","32401 Camino Capistrano","San Juan Capistrano","CA",92675,"Existing",3
+"57","S0057","500 E Manchester Blvd","Inglewood","CA",90301,"Existing",2
+"58","S0058","1855 Cochran St","Simi Valley","CA",93065,"Existing",2
+"59","S0059","950 N 2nd St","El Cajon","CA",92021,"Existing",2
+"60","S0060","351 W Felicita Ave","Escondido","CA",92025,"Existing",2
+"61","S0061","57590 29 Palms Hys","Yucca Valley","CA",92284,"Existing",2
+"62","S0062","11800 De Palma Rd","Corona","CA",92883,"Existing",1
+"63","S0063","4520 W Sunset Blvd","Los Angeles","CA",90028,"Existing",3
+"64","S0064","9119 Reseda Blvd","Northridge","CA",91324,"Existing",3
+"65","S0065","2340 Foothill Blvd","La Verne","CA",91750,"Existing",3
+"66","S0066","522 Orange St","Redlands","CA",92374,"Existing",1
+"67","S0067","660 E Los Angeles Ave","Simi Valley","CA",93065,"Existing",2
+"68","S0068","1011 N San Fernando Blvd","Burbank","CA",91504,"Existing",3
+"69","S0069","1440 W 25th St","San Pedro","CA",90732,"Existing",3
+"70","S0070","4550 Atlantic Ave","Long Beach","CA",90807,"Existing",1
+"71","S0071","1270 E Main St","Barstow","CA",92311,"Existing",2
+"72","S0072","729 N H St","Lompoc","CA",93436,"Existing",2
+"73","S0073","175 N Fairview Ave","Goleta","CA",93117,"Existing",3
+"74","S0074","777 S Glendora Ave","West Covina","CA",91790,"Existing",2
+"75","S0075","870 3rd Ave","Chula Vista","CA",91911,"Existing",2
+"76","S0076","7311 N Figueroa St","Los Angeles","CA",90041,"Existing",3
+"77","S0077","163 S Turnpike Rd","Goleta","CA",93111,"Existing",3
+"78","S0078","3855 State St","Santa Barabra","CA",93105,"Existing",3
+"79","S0079","3027 Rancho Vista Blvd","Palmdale","CA",93551,"Existing",2
+"80","S0080","29530 Rancho California Rd","Temecula","CA",92591,"Existing",1
+"81","S0081","24325 Crenshaw Blvd","Torrance","CA",90503,"Existing",3
+"82","S0082","42170 Big Bear Blvd","Big Bear Lake","CA",92315,"Existing",2
+"83","S0083","130 W Foothill Blvd","Monrovia","CA",91016,"Existing",3
+"84","S0084","5500 Woodruff Ave","Lakewood","CA",90713,"Existing",1
+"85","S0085","561 N Glendale Ave","Glendale","CA",91206,"Existing",3
+"86","S0086","6825 Camino Arroyo","Gilroy","CA",95020,"New",2
+"87","S0087","5353 Almaden Expy","San Jose","CA",95118,"New",2
+"88","S0088","2200 Eastridge Loop","San Jose","CA",95122,"New",2
+"89","S0089","3600 Stevens Creek Blvd","San Jose","CA",95117,"New",3
+"90","S0090","11 W Hillsdale Blvd","San Mateo","CA",94403,"New",3
+"91","S0091","3150 Naglee Rd","Tracy","CA",95304,"New",2
+"92","S0092","6699 Fairmount Ave","El Cerrito","CA",94530,"New",3
+"93","S0093","5709 Lone Tree Way","Antioch","CA",94531,"New",2
+"94","S0094","1149 S Main St","Walnut Creek","CA",94596,"New",3
+"95","S0095","552 Contra Costa Blvd","Pleasant Hill","CA",94523,"New",2

@@ -1,0 +1,107 @@
+---
+title: 'Project 7: Conclusions'
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# Task 1
+1. What is the optimal number of store formats? How did you arrive at that 
+number?
+The optimal number of store formats is 3. I determined this by first summarizing 
+sales data for each store in 2015. Then, I determined the optimal number of 
+clusters assuming a kmeans cluster method through the Calinski-Harabasz, 
+and numerous other, cluster validation methods. 
+
+2. How many stores fall into each store format?
+Per the table below, cluster 1 contains 17 stores, cluster 2 contains 35 stores,
+and cluster 3 contains 33 stores.
+```{r echo=FALSE}
+sum_sales_percentage_2015 %>% group_by(cluster) %>% summarise(count=n())
+```
+
+3. Based on the results of the clustering model, what is one way that the 
+clusters differ from one another?
+The table below summarizes the differences between the 3 clusters. One way that
+the clusters differ from each other, is the percentage of general merchandise
+sales, with Cluster 1 at the highest percentage and Cluster 2 at the lowest
+percentage.
+```{r echo=FALSE}
+sum_sales_percentage_2015 %>% group_by(cluster)
+
+sum_sales_percentage_2015 %>% group_by(cluster) %>% 
+  summarise(dry_grocery=mean(dry_grocery),
+            dairy=mean(dairy),
+            frozen_food=mean(frozen_food),
+            meat=mean(meat),
+            produce=mean(produce),
+            floral=mean(floral),
+            deli=mean(deli),
+            bakery=mean(bakery),
+            general_merchandise=mean(general_merchandise))
+```
+
+4. Please provide a map created in Tableau that shows the location of the 
+existing stores, uses color to show cluster, and size to show total sales. Make 
+sure to include a legend! Feel free to simply copy and paste the map into the 
+submission template.
+The below Tableau map displays the store locations, colored by cluster.
+https://public.tableau.com/profile/michael.gysel#!/vizhome/StoreClusters_10/Dashboard1?publish=yes 
+
+
+# Task 2
+
+1. What methodology did you use to predict the best store format for the new 
+stores? Why did you choose that methodology?
+I used the Random Forest Model because this had the greatest accuracy when 
+predicting correct clusters of the 85 existing stores.
+
+2. What are the three most important variables that help explain the 
+relationship between demographic indicators and store formats? Please include a 
+visualization.
+Per the variable importance plot of the boosted model below, the three most
+important factors are percentage of population ages 0 to 9, percentage of 
+population with a Bachelor's Degree, and home value of atleast $750k.
+```{r echo=FALSE}
+# Variable Importance Factors
+varImpPlot(rf_model)
+```
+
+3. What format do each of the 10 new stores fall into? Please provide a data 
+table.
+The data table below shows the 10 new stores and corresponding clusters.
+```{r echo=FALSE}
+info[85:95,c(1,7)]
+```
+
+
+# Task 3
+
+1. What type of ETS or ARIMA model did you use for each forecast? 
+Use ETS(a,m,n) or ARIMA(ar, i, ma) notation. How did you come to that decision?
+An ETS(M,N,M) Model was used. After assessing the time series decomposition
+plot, it became clear the Error is Multiplicative, Trend is None, and 
+Seasonality is Multiplicative. This ETS Model yielded a higher accuracy than the
+ARIMA Model, so it was chosen for the time series forecast.
+
+2. Please provide a table of your forecasts for existing and new stores. Also, 
+provide visualization of your forecasts that includes historical data, existing 
+stores forecasts, and new stores forecasts.
+The table below shows the produce sales forecasts for existing and new stores 
+for 2016.
+The link below shows the data visualization of total produce sales.
+https://public.tableau.com/profile/michael.gysel#!/vizhome/P7-TotalProduceSales/Dashboard1?publish=yes 
+```{r echo=FALSE}
+# Build forecast tables
+forecasts <- data.frame('Existing Stores' = forecast$mean*85,
+                        'New Stores' = forecast$mean*10)
+
+# Change rownames
+rownames(forecasts) <- c('Jan-16', 'Feb-16', 'Mar-16', 'Apr-16', 'May-16', 'Jun-16', 'Jul-16', 'Aug-16', 'Sep-16', 'Oct-16', 'Nov-16', 'Dec-16')
+
+# Display table
+forecasts
+```
+
+
+

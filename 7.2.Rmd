@@ -1,0 +1,187 @@
+---
+title: 'Project 7 Task 2: Determine the Store Format for New Stores'
+output:
+  html_document:
+    df_print: paged
+---
+
+# Description
+The grocery store chain has 10 new stores opening up at the beginning of the 
+year. The company wants to determine which store format each of the new stores 
+should have. However, we don’t have sales data for these new stores yet, so 
+we’ll have to determine the format using each of the new store’s demographic 
+data.
+
+
+# Classification Models
+1. Decision Tree
+2. Random Forest
+3. Boosted Model
+
+
+# Data Wrangling
+## Gather
+```{r}
+demographic <- read.csv('data/storedemographicdata.csv')
+info <- read.csv('data/storeinformation.csv')
+sales <- read.csv('data/storesalesdata.csv')
+clusters <- read.csv('data/sum_sales_percentage_2015_clusters.csv')
+```
+
+## Clean
+```{r}
+# Add demographic to info
+demo_cluster <- demographic[0:85,2:45]
+demo_cluster$cluster <- clusters$cluster
+```
+
+## Train and Test Datasets
+```{r}
+library(dplyr)
+
+set.seed(3)
+# Train (80% of observations)
+demo_train <- sample_n(demo_cluster, round(0.8*nrow(info)))
+# Test (20% of observations)
+demo_test <- demo_cluster[!(rownames(demo_cluster) %in% rownames(demo_train)),]
+```
+
+
+# Build Models
+## 1. Decision Tree
+### Build Decision Tree
+```{r}
+# Import libraries
+library(rpart)
+
+# Grow tree
+mytree <- rpart(cluster ~ ., data=demo_train)
+
+# Display the results
+printcp(mytree)
+summary(mytree)
+```
+
+### Score Model
+```{r}
+# Load dependency
+library('caret')
+
+# Test Data
+predict <- data.frame('Prediction'=round(predict(mytree, demo_test)))
+predict
+```
+
+### Confusion Matrix
+```{r}
+# Confusion matrix - Yes/no are actual. False/True are predicted
+cm.DecisionTree <- confusionMatrix(factor(demo_test$cluster, levels=c(1,2,3)), factor(predict$Prediction, levels=c(1,2,3)))
+cm.DecisionTree
+```
+The Decision Tree Model has an accuracy of 0.667.
+
+## 2. Random Forest Model
+### Build Random Forest
+```{r}
+# Load dependencies
+library('randomForest')
+
+# do.trace displays the error rate vs. sample size
+fit <- randomForest(cluster ~ ., data=demo_train, importance=TRUE, ntree=100, do.trace=FALSE)
+```
+
+### Score the Model
+```{r}
+# Predict test dataset
+predict <- data.frame('Prediction'=round(predict(fit, demo_test, type='class')))
+predict
+```
+
+### Confusion Matrix
+```{r}
+# Confusion matrix - Yes/no are actual. False/True are predicted
+cm.RandomForest <- confusionMatrix(factor(demo_test$cluster, levels=c(1,2,3)), factor(predict$Prediction, levels=c(1,2,3)))
+cm.RandomForest
+```
+The Random Forest Model has an accuracy of 0.778.
+
+## 3. Boosted Model
+### Build Boosted Model
+```{r}
+# Dependencies
+library('gbm')
+
+# Boosted Model
+boost_model <- gbm(cluster ~ ., data=demo_train, n.trees=1580)
+
+# Check the best number of iterations
+best.iter = gbm.perf(boost_model)
+best.iter
+```
+
+### Score the Model
+```{r}
+# Score the model
+predict <- data.frame('Prediction'=round(predict.gbm(boost_model, newdata=demo_test, n.trees=1580, type='response')))
+predict
+```
+
+### Confusion Matrix
+```{r}
+# Make sure columns are factor type with 3 levels
+demo_test$cluster <- factor(demo_test$cluster, levels=c(1,2,3))
+predict$Prediction <- factor(predict$Prediction, levels=c(1,2,3))
+
+# Confusion matrix
+confusionMatrix(demo_test$cluster, predict$Prediction)
+```
+The Boosted Model has an accuracy of 0.667.
+
+# Predict Store Format
+Use the Random Forest Model to predict the best store format for each of the 10 
+new stores.
+
+## Build Full Random Forest Model
+```{r}
+# Random Forest Model
+rf_model <- randomForest(cluster ~ ., data=demo_cluster, importance=TRUE, ntree=100, do.trace=FALSE)
+```
+
+## Score the 10 New Stores
+```{r}
+# Score the 10 New Stores
+demo_new <- demographic[86:95,2:45]
+predict <- data.frame('Prediction'=round(predict.gbm(boost_model, newdata=demo_new, n.trees=1776, type='response')))
+
+# Add to demographic dataframe
+info$cluster <- c(demo_cluster$cluster, predict$Prediction)
+
+# Export data
+write.csv(info, 'data/info_cluster.csv')
+```
+
+
+# Conclusions
+
+1. What methodology did you use to predict the best store format for the new 
+stores? Why did you choose that methodology?
+I used the Random Forest Model because this had the greatest accuracy when 
+predicting correct clusters of the 85 existing stores.
+
+2. What are the three most important variables that help explain the 
+relationship between demographic indicators and store formats? Please include a 
+visualization.
+Per the variable importance plot of the boosted model below, the three most
+important factors are percentage of population ages 0 to 9, percentage of 
+population with a Bachelor's Degree, and home value of atleast $750k.
+```{r echo=FALSE}
+# Variable Importance Factors
+varImpPlot(rf_model)
+```
+
+3. What format do each of the 10 new stores fall into? Please provide a data 
+table.
+The data table below shows the 10 new stores and corresponding clusters.
+```{r echo=FALSE}
+info[85:95,c(1,7)]
+```

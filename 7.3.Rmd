@@ -1,0 +1,257 @@
+---
+title: 'Project 7 Task 3: Forecasting'
+output:
+  html_document:
+    df_print: paged
+---
+
+# Description
+You’ve been asked to prepare a monthly forecast for produce sales for the full 
+year of 2016 for both existing and new stores. To do so, follow the steps below.
+- Forecast produce sales for existing stores
+- Forecast produce sales for new stores
+
+
+# Data Wrangling
+## Gather
+```{r}
+# Import Data
+demographic <- read.csv('data/storedemographicdata.csv')
+info <- read.csv('data/info_cluster.csv')
+sales <- read.csv('data/storesalesdata.csv')
+```
+## Clean
+```{r}
+# Merge sales data with clusters
+avg_sales_total <- merge(sales, info, by.x='Store', by.y='Store')
+```
+
+
+# Time Series Forecasting
+## Train and Test Datasets
+```{r}
+library(dplyr)
+
+# Aggregate produce sales data across all stores in each cluster by month
+avg_sales <- avg_sales_total %>% group_by(Store, Year, Month) %>% 
+  summarise(avg_produce=sum(Produce)) %>%
+  group_by(Year, Month) %>%
+  summarise(avg_produce=mean(avg_produce))
+
+# Train (to 6/15)
+avg_sales_train <- head(avg_sales, 40)
+# Test (7/15 to 12/15)
+avg_sales_test <- tail(avg_sales, 6)
+```
+## Convert Data to Time Series
+```{r}
+# Load dependencies
+library(PerformanceAnalytics)
+
+# Convert avg_sales to time series object
+ts_train <- ts(avg_sales_train$avg_produce, start=c(2012, 3), end=c(2015, 6), frequency=12)
+ts_full <- ts(avg_sales$avg_produce, start=c(2012, 3), end=c(2015, 12), frequency=12)
+```
+
+
+## ETS Model
+### Determine ETS Components
+```{r}
+# Fit time series decomposition
+fit <- stl(ts_train, s.window='period')
+# Plot
+plot(fit)
+```
+As the above time series decomposition plot shows, the time series displays:
+
+- Error: Multiplicative
+- Trend: None
+- Seasonality: Multiplicative
+
+### Build ETS Model
+```{r}
+# Load dependencies
+library(forecast)
+
+# ETS Model with train dataset
+fit_ets <- ets(ts_train, model='MNM')
+plot(forecast(fit_ets))
+```
+
+### Forecast/Test Accuracy
+```{r}
+# fit_ets is the model prediction
+# ts_full is the actual time series object
+accuracy(forecast(fit_ets, 6), ts_full[41:46])
+
+# Plot accuracy
+# Fitted in Red
+plot(fit_ets$fitted, col='red')
+# Actual in Blue
+lines(ts_full, col='blue')
+```
+The ets model yields an MAPE of 1.92%.
+
+## ARIMA Model
+### Stationarize Dataset
+Plot the data to check if stationary
+```{r}
+# Plot data to check if constant mean/variance
+plot(ts_train)
+```
+The data is not stationary and is seasonal, so let's seasonally stationarize
+the data.
+```{r}
+# First Seasonal Difference
+avg_sales$first_difference <- c(rep(NA,12), diff(avg_sales$avg_produce, lag=12))
+```
+Plot the data again, to check if stationary
+```{r}
+# Make first_difference time series
+ts_fd <- ts(avg_sales$first_difference[1:40], start=c(2012, 3), end=c(2015, 6), frequency=12)
+
+# Plot first_difference
+plot(ts_fd)
+```
+The first_difference does not appear seasonal, but is still not stationary. 
+Let's take a second, non-seasonal difference.
+```{r}
+# Second, non-seasonal difference
+avg_sales$second_difference <- c(NA, diff(avg_sales$first_difference, lag=1))
+```
+Plot the data again, to check if stationary
+```{r}
+# Make second_difference time series
+ts_sd <- ts(avg_sales$second_difference[1:40], start=c(2012, 3), end=c(2015, 6), frequency=12)
+
+# Plot first_difference
+plot(ts_sd)
+```
+Now, the time series displays a constant mean and variance, without any 
+seasonality.
+
+The model structure thus far, after taking a seasonal (D=1) difference and 
+non-seasonal difference (d=1) to stationarize the data, with a period of 12 is:
+- ARIMA(0,1,0)(0,1,0)[12]
+
+### AR and MA Terms
+#### ACF Plot
+```{r}
+# Plot the ACF of second_difference
+ggAcf(avg_sales$second_difference[1:40], lag.max=48)
+```
+#### PACF Plot
+```{r}
+# Plot the PACF of second_difference
+ggPacf(avg_sales$second_difference[1:40], lag.max=48)
+```
+- The ACF and PACF have negative values at lag 1, suggesting a non-seasonal MA
+Term, signified as q=1. 
+- The ACF and PACF have negative values at lag 12, suggesting a seasonal MA
+Term, signified as Q=1.
+
+Thus, the model structure is:
+- ARIMA(0,1,1)(0,1,1)[12]
+
+### Build Model
+```{r}
+# Build Auto Arima Model
+fit_arima <- Arima(ts_train, order=c(0,1,1), seasonal=list(order=c(0,1,1), period=12))
+fit_arima
+```
+
+### Forecast/Test Accuracy
+```{r}
+# fit_arima is the model prediction
+# ts_full is the actual time series object
+accuracy(forecast(fit_arima, 6), ts_full[41:46])
+
+# Plot accuracy
+# Fitted in Blue
+plot(forecast(fit_arima))
+# Actual in Red
+lines(ts_full, col='red')
+```
+The arima model yields an MAPE of 2.82%.
+
+## Predict Next 12 Periods
+
+### Choose Best Model
+The ets model yields the  highest accuracy.
+
+### Build Model with All Data
+Build the ETS Model with all data
+```{r}
+# Arima Model with all data
+fit_bm <- fit_ets <- ets(ts_full, model='MNM')
+plot(forecast(fit_bm))
+```
+
+### Forecast Next 12 Periods
+```{r}
+# ARIMA Model with all data
+forecast <- forecast(fit_bm, 12)
+forecast
+```
+
+
+# Conclusions
+
+1. What type of ETS or ARIMA model did you use for each forecast? 
+Use ETS(a,m,n) or ARIMA(ar, i, ma) notation. How did you come to that decision?
+An ETS(M,N,M) Model was used. After assessing the time series decomposition
+plot, it became clear the Error is Multiplicative, Trend is None, and 
+Seasonality is Multiplicative. This ETS Model yielded a higher accuracy than the
+ARIMA Model, so it was chosen for the time series forecast.
+
+2. Please provide a table of your forecasts for existing and new stores. Also, 
+provide visualization of your forecasts that includes historical data, existing 
+stores forecasts, and new stores forecasts.
+The table below shows the produce sales forecasts for existing and new stores 
+for 2016.
+The link below shows the data visualization of total produce sales.
+https://public.tableau.com/profile/michael.gysel#!/vizhome/P7-TotalProduceSales/Dashboard1?publish=yes 
+```{r echo=FALSE}
+# Build forecast tables
+forecasts <- data.frame('Existing Stores' = forecast$mean*85,
+                        'New Stores' = forecast$mean*10)
+
+# Change rownames
+rownames(forecasts) <- c('Jan-16', 'Feb-16', 'Mar-16', 'Apr-16', 'May-16', 'Jun-16', 'Jul-16', 'Aug-16', 'Sep-16', 'Oct-16', 'Nov-16', 'Dec-16')
+
+# Display table
+forecasts
+```
+
+```{r echo=FALSE}
+# Export data for data visualization
+# Total monthly sales
+
+# Forecast
+sales_forecast <- data.frame('Year'=as.integer(rep(c(2016),12)),
+                             'Month'=as.integer(seq(1,12,1)),
+                             'Existing'=as.numeric(forecasts$Existing.Stores),
+                             'New'=as.numeric(forecasts$New.Stores))
+
+# Past sales
+sales_past <- avg_sales_total %>% group_by(Year, Month) %>% 
+  summarise(avg_produce=sum(Produce))
+
+# Timeframe
+dates <- seq(as.Date("2012/3/1"), as.Date("2016/12/1"), by = "month")
+# Existing
+existing_data <- c(sales_past$avg_produce, sales_forecast$Existing)
+# New
+new_data <- c(rep(NA,46),sales_forecast$New)
+# Combine for all sales data
+sales_forecasts <- data.frame('Date'=dates,
+                              'Existing'=existing_data, 
+                              'New'=new_data)
+
+# Export data
+write.csv(sales_forecasts, 'data/sales_forecasts.csv')
+```
+
+
+
+

@@ -1,0 +1,138 @@
+---
+title: 'Project 7 Task 1: Store Format'
+output:
+  html_document:
+    df_print: paged
+---
+
+# Description
+Determine the optimal number of store formats based on sales data.
+- Sum sales data by StoreID and Year
+- Use percentage sales per category per store for clustering (category sales
+as a percentage of total store sales)
+- Use only 2015 sales data
+- Use a K-means clustering model
+
+# Task 1: Store Format
+## Import Data
+```{r}
+demographic <- read.csv('data/storedemographicdata.csv')
+info <- read.csv('data/storeinformation.csv')
+sales <- read.csv('data/storesalesdata.csv')
+```
+
+## Data Wrangling
+```{r}
+library(dplyr)
+
+# Sum sales categories by store and year
+sum_sales <- sales %>% group_by(Store, Year) %>% 
+  summarise(dry_grocery=sum(Dry_Grocery),
+            dairy=sum(Dairy),
+            frozen_food=sum(Frozen_Food),
+            meat=sum(Meat),
+            produce=sum(Produce),
+            floral=sum(Floral),
+            deli=sum(Deli),
+            bakery=sum(Bakery),
+            general_merchandise=sum(General_Merchandise))
+# Sum of all categories
+sum_sales$total <- sum_sales$dry_grocery + sum_sales$dairy + sum_sales$frozen_food + sum_sales$meat + sum_sales$produce + sum_sales$floral + sum_sales$deli + sum_sales$bakery + sum_sales$general_merchandise
+
+# Determine percentage of total
+sum_sales_percentage <- data.frame(store=sum_sales$Store,
+                                   year=sum_sales$Year,
+                                   dry_grocery=100*sum_sales$dry_grocery/sum_sales$total,
+                                   dairy=100*sum_sales$dairy/sum_sales$total,
+                                   frozen_food=100*sum_sales$frozen_food/sum_sales$total,
+                                   meat=100*sum_sales$meat/sum_sales$total,
+                                   produce=100*sum_sales$produce/sum_sales$total,
+                                   floral=100*sum_sales$floral/sum_sales$total,
+                                   deli=100*sum_sales$deli/sum_sales$total,
+                                   bakery=100*sum_sales$bakery/sum_sales$total,
+                                   general_merchandise=100*sum_sales$general_merchandise/sum_sales$total)
+
+# Check to make sure each column adds up to 100
+sum_sales_percentage$total <- sum_sales_percentage$dry_grocery + sum_sales_percentage$dairy + sum_sales_percentage$frozen_food + sum_sales_percentage$meat + sum_sales_percentage$produce + sum_sales_percentage$floral + sum_sales_percentage$deli + sum_sales_percentage$bakery + sum_sales_percentage$general_merchandise
+
+# Obtain 2015 sales data
+sum_sales_percentage_2015 <- subset(sum_sales_percentage, year==2015)
+```
+
+## Cluster Validation
+```{r}
+# Load dependencies
+library(NbClust)
+
+# Determine optimal number of clusters
+NbClust(sum_sales_percentage_2015[3:11], method='kmeans', index='ch')
+summary <- NbClust(sum_sales_percentage_2015[3:11], method='kmeans', index='all')
+```
+Per the Calinski-Harabasz Method, as well as 4 other cluster validation methods,
+3 clusters should be used.
+
+## Build Cluster Model
+```{r}
+# Load dependencies
+library(robustHD)
+
+# Build Model around standardized data
+fit <- kmeans(standardize(sum_sales_percentage_2015[3:11]), 3)
+
+# Attach clusters to dataframe
+sum_sales_percentage_2015$cluster <- fit$cluster
+sum_sales_percentage_2015$total_sales <- subset(sum_sales, Year==2015)$total
+
+# Export data
+write.csv(sum_sales_percentage_2015, 'data/sum_sales_percentage_2015_clusters.csv')
+```
+
+## Conclusions
+
+1. What is the optimal number of store formats? How did you arrive at that 
+number?
+The optimal number of store formats is 3. I determined this by first summarizing 
+sales data for each store in 2015. Then, I determined the optimal number of 
+clusters assuming a kmeans cluster method through the Calinski-Harabasz, 
+and numerous other, cluster validation methods. 
+
+2. How many stores fall into each store format?
+Per the table below, cluster 1 contains 17 stores, cluster 2 contains 35 stores,
+and cluster 3 contains 33 stores.
+```{r echo=FALSE}
+sum_sales_percentage_2015 %>% group_by(cluster) %>% summarise(count=n())
+```
+
+3. Based on the results of the clustering model, what is one way that the 
+clusters differ from one another?
+The table below summarizes the differences between the 3 clusters. One way that
+the clusters differ from each other, is the percentage of general merchandise
+sales, with Cluster 1 at the highest percentage and Cluster 2 at the lowest
+percentage.
+```{r echo=FALSE}
+sum_sales_percentage_2015 %>% group_by(cluster)
+
+sum_sales_percentage_2015 %>% group_by(cluster) %>% 
+  summarise(dry_grocery=mean(dry_grocery),
+            dairy=mean(dairy),
+            frozen_food=mean(frozen_food),
+            meat=mean(meat),
+            produce=mean(produce),
+            floral=mean(floral),
+            deli=mean(deli),
+            bakery=mean(bakery),
+            general_merchandise=mean(general_merchandise))
+```
+
+4. Please provide a map created in Tableau that shows the location of the 
+existing stores, uses color to show cluster, and size to show total sales. Make 
+sure to include a legend! Feel free to simply copy and paste the map into the 
+submission template.
+The below Tableau map displays the store locations, colored by cluster.
+https://public.tableau.com/profile/michael.gysel#!/vizhome/StoreClusters_10/Dashboard1?publish=yes 
+
+
+
+
+
+
